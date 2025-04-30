@@ -1,24 +1,121 @@
+import pytest
+
+
 from main import BooksCollector
 
-# класс TestBooksCollector объединяет набор тестов, которыми мы покрываем наше приложение BooksCollector
-# обязательно указывать префикс Test
+
 class TestBooksCollector:
 
-    # пример теста:
-    # обязательно указывать префикс test_
-    # дальше идет название метода, который тестируем add_new_book_
-    # затем, что тестируем add_two_books - добавление двух книг
-    def test_add_new_book_add_two_books(self):
-        # создаем экземпляр (объект) класса BooksCollector
-        collector = BooksCollector()
+#тесты на добавление новых книг
+    @pytest.mark.parametrize(
+        'list_book, result',
+        [
+            ('Мать тьма', +1),
+            ('Путешествие в Элевсин', 0),
+            ('', 0),
+            ('Так говорил заратустра или не говорил кто его знает', 0)
+        ],
+        ids=[
+            'should add new book',
+            'should not add duplicate book',
+            'should reject empty name',
+            'should reject long name'
+        ]
+    )
+    def test_add_new_book(self, list_book, result, books_collector):
+        initial_count = len(books_collector.get_books_genre())
+        books_collector.add_new_book(list_book)
+        final_count = len(books_collector.get_books_genre())
+        assert final_count - initial_count == result
 
-        # добавляем две книги
-        collector.add_new_book('Гордость и предубеждение и зомби')
-        collector.add_new_book('Что делать, если ваш кот хочет вас убить')
+#тесты на установление жанра книге
+    @pytest.mark.parametrize(
+        'book_name, genre, expected_genre',
+        [
+            ('Путешествие в Элевсин', 'Ужасы', 'Ужасы'),
+            ('Тьма', 'Ужасы', None),
+            ('Путешествие в Элевсин', 'Приколы', 'Ужасы'),
+            ('Тьма', 'Приколы', None),
+        ],
+        ids=[
+            'correct book correct genre',
+            'unknown book correct genre',
+            'correct book unknown genre',
+            'unknown book unknown genre',
 
-        # проверяем, что добавилось именно две
-        # словарь books_rating, который нам возвращает метод get_books_rating, имеет длину 2
-        assert len(collector.get_books_rating()) == 2
+        ]
+    )
+    def test_set_book_genre(self, book_name, genre, expected_genre, books_collector):
+        books_collector.set_book_genre(book_name, genre)
+        assert books_collector.get_book_genre(book_name) == expected_genre
 
-    # напиши свои тесты ниже
-    # чтобы тесты были независимыми в каждом из них создавай отдельный экземпляр класса BooksCollector()
+#тест на получение жанра книги по имени
+    def test_get_book_genre_success(self, books_collector):
+        book_name = 'Путешествие в Элевсин'
+        expected_genre = 'Ужасы'
+        assert books_collector.get_book_genre(book_name) == expected_genre
+
+#тесты на вывод книг с определенным жанром
+    @pytest.mark.parametrize(
+        'genre, expected_books',
+        [
+        ('Ужасы', ['Путешествие в Элевсин']),
+        ('Приколы', []),  # Несуществующий жанр
+        ('', [])  # Пустой жанр
+        ],
+        ids=[
+            'correct book correct genre',
+            'unknown genre',
+            'zero genre'
+        ]
+        )
+    def test_get_books_with_different_genres(self, genre, expected_books, books_collector):
+        result = books_collector.get_books_with_specific_genre(genre)
+        assert result == expected_books
+
+#проверка, что выводятся книги из словаря
+    def test_get_books_genre_success(self, books_collector):
+        expected_books = books_collector.books_genre
+        assert books_collector.get_books_genre() == expected_books
+
+#тест на вывод книг, подходящих детям
+    def test_get_books_for_children_success(self, books_collector):
+        assert books_collector.get_books_for_children() == ['Чебурашка', 'Большие надежды']
+
+#тесты на добавление книг в Избранное
+    @pytest.mark.parametrize(
+        'name_book, result',
+        [
+        ('Путешествие в Элевсин', 2),
+        ('Большие надежды', 1),
+        ('Тьма', 1)
+        ],
+        ids=[
+            'correct book in favorites',
+            'incorrect book not in favorites',
+            'unknown book not in favorites'
+        ]
+    )
+    def test_add_book_in_favorites(self, name_book, result, books_collector):
+        books_collector.add_book_in_favorites(name_book)
+        assert len(books_collector.get_list_of_favorites_books()) == result
+
+#тест на корректное удаление книги из избранного
+    @pytest.mark.parametrize(
+        'book, result',
+        [
+            ('Большие надежды', 0),
+            ('Тьма', 1)
+        ],
+        ids=[
+            'correct delete book',
+            'incorrect book not in delete',
+        ]
+    )
+    def test_delete_book_from_favorites_correct_delete(self, book, result, books_collector):
+        books_collector.delete_book_from_favorites(book)
+        assert len(books_collector.get_list_of_favorites_books()) == result
+
+#тест на получение списка избранных книг
+    def test_get_list_of_favorites_books_success(self, books_collector):
+        assert 'Большие надежды' in books_collector.get_list_of_favorites_books()
