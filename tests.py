@@ -75,11 +75,11 @@ class TestBooksCollector:
 
 #проверка, что выводится три книги из словаря
     def test_get_books_genre_in_three(self, books_collector):
-        assert len(books_collector.books_genre) == 3
+        assert len(books_collector.get_books_genre()) == 3
 
 #тест на вывод книг, подходящих детям
     def test_get_books_for_children_success(self, books_collector):
-        assert set(books_collector.get_books_for_children()) == {'Чебурашка', 'Большие надежды'}
+        assert books_collector.get_books_for_children() == ['Чебурашка', 'Большие надежды']
 
 #тесты на добавление книг в Избранное
     @pytest.mark.parametrize(
