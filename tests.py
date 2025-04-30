@@ -73,8 +73,8 @@ class TestBooksCollector:
         result = books_collector.get_books_with_specific_genre(genre)
         assert result == expected_books
 
-#проверка, что выводится три книги из словаря
-    def test_get_books_genre_in_three(self, books_collector):
+#проверка, что выводятся книги из словаря
+    def test_get_books_genre_success(self, books_collector):
         expected_books = books_collector.books_genre
         assert books_collector.get_books_genre() == expected_books
 

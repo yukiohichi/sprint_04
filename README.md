@@ -11,7 +11,7 @@
 
 4. **test_get_books_with_different_genres** - тесты на вывод книг с определенным жанром
 
-5. **test_get_books_genre_in_three** - проверка, что выводится три книги из словаря
+5. **test_get_books_genre_success** - проверка, что выводятся книги из словаря
 
 6. **test_get_books_for_children_success** - тест на вывод книг, подходящих детям
 
