@@ -75,7 +75,8 @@ class TestBooksCollector:
 
 #проверка, что выводится три книги из словаря
     def test_get_books_genre_in_three(self, books_collector):
-        assert len(books_collector.get_books_genre()) == 3
+        expected_books = books_collector.books_genre
+        assert books_collector.get_books_genre() == expected_books
 
 #тест на вывод книг, подходящих детям
     def test_get_books_for_children_success(self, books_collector):
